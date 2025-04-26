@@ -1,5 +1,7 @@
 from fastapi import FastAPI
+from fastapi import Query
 from common.data_layer import cargar_cities
+import common.data_layer_c as data_layer_c
 
 app = FastAPI()
 
@@ -8,3 +10,17 @@ def obtener_cities():
     df = cargar_cities()
     return df.to_dict(orient="records")
 
+@app.get("/api/state_borders")
+def obtener_estado_fronteras():
+    df = data_layer_c.estado_fronteras()
+    return df.to_dict(orient="records")
+
+@app.get("/api/city_borders")
+def obtener_ciudad_fronteras():
+    df = data_layer_c.ciudad_fronteras()
+    return df.to_dict(orient="records")
+
+@app.get("/api/parcels")
+def obtener_parcelas():
+    df = data_layer_c.parcels()
+    return df.to_dict(orient="records")
