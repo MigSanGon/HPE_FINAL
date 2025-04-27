@@ -152,27 +152,27 @@ else:
     if is_urgent == 'Sí':
         # Eliminar df_Ph y filtrar df_HC para que solo contenga 'Urgent Care'
         filtered_df_HC = df_HC[df_HC['subtype'] == 'Urgent Care']
-        available_datasets = [filtered_df_HC]
-        st.write("Estás buscando asistencia urgente. Solo se muestran opciones de clínicas con urgencias u hospitales.")
+        available_datasets = pd.concat([filtered_df_HC, df_H])
+        st.write("Está buscando asistencia urgente. Solo se muestran opciones de clínicas con urgencias u hospitales.")
     else:
         # Eliminar df_H (hospitales) si no es urgente
-        available_datasets = [df_HC, df_Ph]
-        st.write("Estás buscando asistencia no urgente. Se muestran opciones de clínicas y farmacias.")
+        available_datasets = pd.concat([df_HC, df_Ph])
+        st.write("Está buscando asistencia no urgente. Se muestran opciones de clínicas y farmacias.")
 
     # Preguntar por la ciudad
     city_name = st.selectbox("Selecciona la ciudad:", options=[''] + list(df_H['city_name'].unique()))
     
     if city_name:
         # Filtrar los DataFrames por la ciudad seleccionada
-        if is_urgent == 'Sí':
-            filtered_data = filter_df_by_city(filtered_df_HC, city_name)
-        else:
-            filtered_data_HC = filter_df_by_city(df_HC, city_name)
-            filtered_data_Ph = filter_df_by_city(df_Ph, city_name)
-            st.write("Mostrando resultados de Clínicas y Farmacias:")
-            st.write(filtered_data_HC)
-            st.write(filtered_data_Ph)
+        filtered_data = filter_df_by_city(available_datasets, city_name)
+        
+        columns_to_remove = ['infra_id', "id_x", "id_y",'city_id',  'city_name', 'opening_date',
+        'green_score', 'carbon_footprint_kg_per_year', 'energy_efficiency_score',
+        'water_efficiency_score', 'waste_management_score',
+        'renewable_energy_percentage', 'green_certification', 'location']
+        selected_columns_df = filtered_data.drop(columns_to_remove,axis=1)
 
-        # Mostrar los DataFrames filtrados para la ciudad seleccionada
-        st.write(filtered_data)
+        # Mostrar el DataFrame filtrado en Streamlit
+        st.dataframe(selected_columns_df)
+    
 

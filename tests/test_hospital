@@ -1,0 +1,35 @@
+import requests
+import json
+
+def test_nearby_hospitals(lat,lon,radius=1000):
+    # Parámetros de latitud, longitud y radio
+    # lat = 79.8965515
+    # lon = -48.0003246
+    # radius = 1000
+
+    # URL de la API FastAPI
+    url = f"http://localhost:8080/api/hospitals/nearby?lat={lat}&lon={lon}&radius={radius}"
+
+    # Hacer la solicitud GET a la API
+    response = requests.get(url)
+
+    # Verificar que la respuesta fue exitosa (código 200)
+    if response.status_code == 200:
+        # Convertir la respuesta JSON en un diccionario de Python
+        response_data = response.json()
+
+        # Imprimir la respuesta en formato JSON
+        print(json.dumps(response_data, indent=2))
+        
+        # Validar que la estructura sea la esperada
+        assert "metadata" in response_data
+        assert "status" in response_data["metadata"]
+        assert "timestamp" in response_data["metadata"]
+        assert "results" in response_data
+        print("La respuesta es válida.")
+    else:
+        print(f"Error en la solicitud: {response.status_code}")
+
+test_nearby_hospitals(79.8965515,-48,1000)
+
+
