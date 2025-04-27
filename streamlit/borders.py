@@ -27,7 +27,6 @@ def convertir_parcel_vertices(vertices_string):
             coords.append([lon, lat])  
     return [coords]  # Devolver lista de listas para PolygonLayer
 
-from shapely.geometry import Polygon
 
 def calcular_centro(coordinates):
     if coordinates and isinstance(coordinates, list):
