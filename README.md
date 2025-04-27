@@ -19,7 +19,7 @@ Este repositorio contiene:
 
 1. Clona el repositorio en la VM:
    ```bash
-   git clone https://github.com/usuario/tu-repo.git
+   git clone https://github.com/MigSanGon/HPE_FINAL.git
    cd tu-repo
    ```
 
