@@ -1,14 +1,16 @@
 from fastapi import FastAPI
+from typing import Optional
+from common.data_layer import cargar_people_enriquecido
 from fastapi import Query
 from datetime import datetime
-from common.data_layer import cargar_cities
 import common.data_layer_c as data_layer_c
+
 
 app = FastAPI()
 
-@app.get("/api/cities")
-def obtener_cities():
-    df = cargar_cities()
+@app.get("/api/greenlake-eval/people")
+def obtener_people(skip: int = 0, limit: int = 100):
+    df = cargar_people_enriquecido(skip=skip, limit=limit)
     return df.to_dict(orient="records")
 
 @app.get("/api/state_borders")
@@ -48,3 +50,4 @@ def ping():
         }
     }
      
+
