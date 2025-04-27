@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from typing import Optional
-from common.data_layer import cargar_people_enriquecido
+from common.data_layer import cargar_people_enriquecido, obtener_hospitales_cercanos
 from fastapi import Query
 from datetime import datetime
 import common.data_layer_c as data_layer_c
@@ -51,3 +51,20 @@ def ping():
     }
      
 
+@app.get("/api/greenlake-eval/hospitals/nearby")
+def hospitales_cercanos(
+    lat: float = Query(..., description="Latitud del punto central"),
+    lon: float = Query(..., description="Longitud del punto central"),
+    radius: int = Query(1000, description="Radio en metros (opcional, por defecto 1000)")
+):
+    df = obtener_hospitales_cercanos(lat, lon, radius)
+
+    resultados = df.to_dict(orient="records")
+
+    return {
+        "metadata": {
+            "status": "success",
+            "timestamp": datetime.utcnow().isoformat() + "Z"
+        },
+        "results": resultados
+    }

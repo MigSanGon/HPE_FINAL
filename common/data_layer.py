@@ -33,3 +33,27 @@ def cargar_people_enriquecido(skip=0, limit=100):
     """)
     df = pd.read_sql(query, engine)
     return df
+
+
+
+def obtener_hospitales_cercanos(lat, lon, radius=1000):
+    query = text(f"""
+        SELECT
+        id,
+        city_id,
+        name,
+        ST_X(location) AS longitude,
+        ST_Y(location) AS latitude,
+        ST_Distance(location::geography, ST_MakePoint(:lon, :lat)::geography) AS distance_m
+    FROM infrastructure
+    WHERE type = 'Hospital'
+    AND ST_DWithin(location::geography, ST_MakePoint(:lon, :lat)::geography, :radius)
+    ORDER BY distance_m ASC;
+
+    """)
+
+    with engine.connect() as connection:
+        result = connection.execute(query, {"lat": lat, "lon": lon, "radius": radius})
+        df = pd.DataFrame(result.fetchall(), columns=result.keys())
+
+    return df
