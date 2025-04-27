@@ -24,3 +24,13 @@ def obtener_ciudad_fronteras():
 def obtener_parcelas():
     df = data_layer_c.parcels()
     return df.to_dict(orient="records")
+
+@app.get("/api/roads")
+def obtener_carreteras():
+    df = data_layer_c.roads()
+    return df.to_dict(orient="records")
+
+@app.get("/api/rental_vehicles")
+def obtener_vehiculos_de_alquiler():
+    df = data_layer_c.rental_vehicles()
+    return df.to_dict(orient="records")

@@ -34,7 +34,8 @@ def calcular_centro(coordinates):
         return Polygon(coordinates[0]).centroid
     else:
         return None
-
+    
+@st.cache_data
 def cargar_estados():
     url = "http://localhost:8080/api/state_borders"
     response = requests.get(url)
@@ -45,6 +46,7 @@ def cargar_estados():
     else:
         st.error("No se pudieron cargar los datos de la API.")
 
+@st.cache_data
 def cargar_ciudades():
     url = f"http://localhost:8080/api/city_borders"
     response = requests.get(url)
@@ -55,6 +57,7 @@ def cargar_ciudades():
     else:
         st.error("No se pudieron cargar los datos de la API.")
 
+@st.cache_data
 def cargar_parcels():
     url = f"http://localhost:8080/api/parcels"
     response = requests.get(url)
