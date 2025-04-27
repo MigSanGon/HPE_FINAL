@@ -2,126 +2,134 @@ import streamlit as st
 import pandas as pd
 import requests
 
-st.title("Visualización de infraestructuras general")
+def app(change_page_func):  # 👈 El cambio_page_func ya está como parámetro
+    # Inicializar página actual
+    if "page" not in st.session_state:
+        st.session_state.page = "descan"
+    st.title("Visualización de infraestructuras general")
 
-# Llamada a la API para cargar datos
-def cargar_datos(url):
-    response = requests.get(url)
-    if response.status_code == 200:
-        data = response.json()
-        return pd.DataFrame(data)
-    else:
-        st.error(f"No se pudieron cargar los datos de la API: {url}")
-        return pd.DataFrame()
-
-# --- Cargar datos desde la API ---
-
-
-url_cities = "http://localhost:8080/api/cities"
-
-# Cargar los DataFrames
-# df_venue = cargar_datos(url_venue)
-
-df_C = cargar_datos(url_cities)
-
-# Renombramos columna para hacer el merge más fácil en df_C
-if not df_C.empty:
-    df_C = df_C.rename(columns={'name': 'city_name'})
-
-
-# Función para cargar los datos desde una URL
-def cargar_datos(url):
-    response = requests.get(url)
-    if response.status_code == 200:
-        return pd.DataFrame(response.json())
-    else:
-        return pd.DataFrame()
-
-# Función principal que maneja la lógica de cargar y combinar los datos
-def cargar_y_combinar_datos(tipo_edificios, df_C):
-    for tipo in tipo_edificios:
-        # URL dinámica para cada tipo de infraestructura
-        url = f"http://localhost:8080/api/{tipo.lower().replace(' ', '_')}"
-        df = cargar_datos(url)
-        
-        # Si hay datos, realizar el merge
-        if not df.empty:
-            df = df.merge(
-                df_C[['id', 'city_name']],        
-                left_on='city_id',                
-                right_on='id',                    
-                how='left'                        
-            )
-            st.write(f"Aquí está la tabla de datos de {tipo}:")
-            
-            st.dataframe(df)
+    # Función para cargar datos
+    @st.cache_data
+    def cargar_datos(url):
+        response = requests.get(url)
+        if response.status_code == 200:
+            return pd.DataFrame(response.json())
         else:
-            st.write(f"No se encontraron datos para {tipo}.")
+            st.error(f"No se pudieron cargar los datos de la API: {url}")
+            return pd.DataFrame()
 
-# Streamlit - Interfaz de usuario
+    # Cargar ciudades
+    url_cities = "http://localhost:8080/api/cities"
+    df_C = cargar_datos(url_cities)
 
+    if not df_C.empty:
+        df_C = df_C.rename(columns={'name': 'city_name'})
 
+    def cargar_y_combinar_datos(tipo_edificios, df_C):
+        for tipo in tipo_edificios:
+            url = f"http://localhost:8080/api/{tipo.lower().replace(' ', '_')}"
+            df = cargar_datos(url)
 
-#HASTA AQUÍ LA CARGA DE DATOS: AHORA TOCA JUGAR
+            if not df.empty:
+                df = df.merge(
+                    df_C[['id', 'city_name']],
+                    left_on='city_id',
+                    right_on='id',
+                    how='left'
+                )
+            else:
+                st.write(f"No se encontraron datos para {tipo}.")
+            return df
 
-# # Función para filtrar los DataFrames
-# def filter_df_by_city(df, city_name):
-#     return df[df['city_name'] == city_name]
+    # UI de selección
+    col1, col2 = st.columns(2)
 
-# # Mostrar una pregunta para saber si necesita asistencia médica
-show_table = st.radio('¿Qué quieres hacer?', [ 'Ver las tablas de datos disponibles',
-                                               "Ver información de sostenibilidad"])
+    with col1:
+        show_tables = st.button('Ver las tablas de datos disponibles', key="button_tablas")
+    with col2:
+        show_sustainability = st.button('Ver información de sostenibilidad', key="button_sostenibilidad")
 
-# # Si el botón es presionado, mostramos la tabla
-tipos_edificios = [
+    tipos_edificios = [
         'Shop', 'Hospital', 'Religious Building', 'Pharmacy', 'Venue',
         'Healthcare Clinic', 'Gas Station', 'School', 'Daycare', 'Park', 'Restaurant',
         'Office Building', 'Supermarket', 'Bank', 'Hotel', 'Transportation Hub', 'Gym',
         'Auto Service', 'Laundromat', 'Salon', 'Pet Services', 'Government Building',
         'Senior Living', 'Fabric'
     ]
-if show_table=='Ver las tablas de datos disponibles':
+
+    if show_tables:
+        seleccionados = st.multiselect("Selecciona los tipos de edificios", tipos_edificios, key="multiselect_tablas")
+        for i in seleccionados:
+            df = cargar_y_combinar_datos([i], df_C)
+            st.write(f"Aquí está la tabla de datos de {i}:")
+            st.dataframe(df)
+
+    elif show_sustainability:
+        seleccionados = st.multiselect("Selecciona los tipos de edificios", tipos_edificios, key="multiselect_sostenibilidad")
+        for i in seleccionados:
+            df = cargar_y_combinar_datos([i], df_C)
+
+            cities = df['city_name'].dropna().unique()
+            selected_city = st.selectbox("Selecciona la ciudad:", sorted(cities), key=f"city_select_{i}")
+
+            filtered_df = df[df['city_name'] == selected_city]
+
+            st.dataframe(filtered_df[['name', 'type', 'subtype', 'city_name']])
+
+            st.markdown("---")
+
+            selected_metrics = st.multiselect(
+                "Selecciona las métricas que quieres comparar:",
+                ['green_score', 'carbon_footprint_kg_per_year', 'energy_efficiency_score',
+                 'water_efficiency_score', 'waste_management_score', 'renewable_energy_percentage'],
+                default=['green_score', 'energy_efficiency_score'],
+                key=f"metrics_select_{i}"
+            )
+
+            if selected_metrics:
+                st.subheader("Gráfica comparativa de las infraestructuras")
+                chart_data = filtered_df[['name'] + selected_metrics].set_index('name')
+                st.bar_chart(chart_data)
+
+    # st.header('Aquí hay más utilidades para los ciudadanos')
     
+
+    # Función para cambiar de página
+    def change_page(page_name):
+        st.session_state.page = page_name
+    # Botones de navegación usando el cambio_page_func que te pasan
     
-    # Selector múltiple para que el usuario elija los tipos de edificios
-    seleccionados = st.multiselect("Selecciona los tipos de edificios", tipos_edificios)
-    for i in seleccionados:
-        cargar_y_combinar_datos([i], df_C)
+        if st.button(" 🩺 Salud 💊 ", key="button_salud"):
+            change_page_func("salud")
+            from app_med import app
+            app(change_page)
 
-elif show_table== "Ver información de sostenibilidad":
+        if st.button("👶 Asistencia 🐶", key="button_asistencia"):
+            change_page_func("asis")
+            from app_asist import app
+            app(change_page)
+
+        if st.button("🛒 Compras 🚐", key="button_compras"):
+            change_page_func("compra")
+            from app_supply import app
+            app(change_page)
+
+    # elif st.session_state.page == "salud":
+    #     from app_med import app
+    #     app(change_page)
+
+    # elif st.session_state.page == "asis":
+    #     from app_asist import app
+    #     app(change_page)
+
+    # elif st.session_state.page == "compra":
+    #     from app_supply import app
+    #     app(change_page)
+
     
-    common_columns = [
-    'infra_id', 'name', 'type', 'subtype', 'city_name', 'opening_date',
-    'green_score', 'carbon_footprint_kg_per_year', 'energy_efficiency_score',
-    'water_efficiency_score', 'waste_management_score',
-    'renewable_energy_percentage', 'green_certification', 'location'
-]
 
-    
 
-    # Filtro por ciudad
-    cities = df_all['city_name'].dropna().unique()
-    selected_city = st.selectbox("Selecciona la ciudad:", sorted(cities))
-
-    # Filtrar según ciudad
-    filtered_df = df_all[df_all['city_name'] == selected_city]
-
-    # Mostrar tabla
-    st.dataframe(filtered_df[['name', 'type', 'subtype', 'city_name']])
-
-    # Divider
-    st.markdown("---")
-
-    # Selección de métricas para comparar
-    selected_metrics = st.multiselect(
-        "Selecciona las métricas que quieres comparar:",
-        ['green_score', 'carbon_footprint_kg_per_year', 'energy_efficiency_score',
-        'water_efficiency_score', 'waste_management_score', 'renewable_energy_percentage'],
-        default=['green_score', 'energy_efficiency_score']
-    )
-
-    if selected_metrics:
-        st.subheader("Gráfica comparativa de las infraestructuras")
-        
-        chart_data = filtered_df[['name'] + selected_metrics].set_index('name')
-        st.bar_chart(chart_data)
+    # Botón para volver al inicio
+    st.markdown("<div style='height:5px'></div>", unsafe_allow_html=True)
+    if st.button("🏠 Volver al Inicio", key="button_inicio"):
+        change_page_func("home")

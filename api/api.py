@@ -4,7 +4,6 @@ from common.data_layer import cargar_people_enriquecido, obtener_hospitales_cerc
 from fastapi import Query
 from datetime import datetime
 import common.data_layer_c as data_layer_c
-<<<<<<< HEAD
 from common.data_layer_med import cargar_med,cargar_clin,cargar_phar,cargar_cities1
 from common.data_layer_asist import cargar_dayc,cargar_pet,cargar_seni,cargar_event_c,cargar_event_s
 from common.data_layer_supply import cargar_gas,cargar_shop,cargar_super,cargar_auto
@@ -12,13 +11,6 @@ from common.data_layer_descan import cargar_fabric,cargar_gym,cargar_venue,carga
 
 app = FastAPI()
 
-
-=======
-
-
-app = FastAPI()
-
->>>>>>> origin/develop
 @app.get("/api/greenlake-eval/people")
 def obtener_people(skip: int = 0, limit: int = 100):
     df = cargar_people_enriquecido(skip=skip, limit=limit)
@@ -78,7 +70,7 @@ def hospitales_cercanos(
             "timestamp": datetime.utcnow().isoformat() + "Z"
         },
         "results": resultados
-<<<<<<< HEAD
+
     }
 
 @app.get("/api/cities")
@@ -226,6 +218,3 @@ def obtener_fabric():
     return df.to_dict(orient="records")
 
 
-=======
-    }
->>>>>>> origin/develop

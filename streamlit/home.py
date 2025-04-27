@@ -59,6 +59,18 @@ if st.session_state.page == "home":
     if st.button("🚗 🗺️  Explorador de Rutas"):
         change_page("rutas")
 
+    if st.button("🏢 Infraestructuras para usuario 🏫"):
+        change_page("infra")
+    
+    if st.button(" 🩺 Salud 💊 ", key="button_salud"):
+        change_page("salud")
+
+    if st.button("👶 Asistencia 🐶", key="button_asistencia"):
+        change_page("asis")
+
+    if st.button("🛒 Compras 🚐", key="button_compras"):
+        change_page("compra")
+
    
 
 
@@ -72,4 +84,20 @@ elif st.session_state.page == "mapas":
 
 elif st.session_state.page == "rutas":
     from roads import app
+    app(change_page)
+
+elif st.session_state.page == "infra":
+    from app_descan import app
+    app(change_page)
+
+elif st.session_state.page == "salud":
+    from app_med import app
+    app(change_page)
+
+elif st.session_state.page == "asist":
+    from app_asist import app
+    app(change_page)
+
+elif st.session_state.page == "compra":
+    from app_supply import app
     app(change_page)
