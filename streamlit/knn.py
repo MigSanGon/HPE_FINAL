@@ -1,11 +1,15 @@
 import pandas as pd
 import numpy as np
+import os
 from sklearn.preprocessing import LabelEncoder, MinMaxScaler
 from sklearn.neighbors import NearestNeighbors
 
 
-# Cargar el CSV
-df = pd.read_csv('/home/cdstechchallenge/Escritorio/HPE_FINAL/datasetIncluido/spotify_tracks_with_personality.csv')
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+csv_path = os.path.join(BASE_DIR, '..', 'datasetIncluido', 'spotify_tracks_with_personality.csv')
+
+df = pd.read_csv(csv_path)
+
 
 # Preprocesamiento
 df['explicit'] = df['explicit'].astype(int)
