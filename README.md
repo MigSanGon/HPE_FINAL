@@ -48,6 +48,56 @@ Ejecuta el siguiente comando para levantar la aplicación Streamlit en el puerto
 ```bash
 streamlit run streamlit/home.py --server.address=0.0.0.0 --server.port=8501
 ```
+## Uso de tmux para mantener procesos activos
+
+### Instalación de tmux
+```bash
+sudo apt update
+sudo apt install tmux
+```
+
+### Levantar el Backend usando tmux
+
+1. Crea una nueva sesión de tmux llamada `backend`:
+   ```bash
+   tmux new -s backend
+   ```
+2. Dentro de esa sesión, ejecuta tu backend:
+   ```bash
+   uvicorn app.main:app --host 0.0.0.0 --port 5454
+   ```
+3. Para desconectarte de tmux:
+   - Pulsa `Ctrl + b`, luego suelta y pulsa `d` (detach).
+
+### Levantar el Frontend usando tmux
+
+1. Crea otra sesión tmux llamada `frontend`:
+   ```bash
+   tmux new -s frontend
+   ```
+2. Dentro de esa sesión, ejecuta tu frontend:
+   ```bash
+   streamlit run app_front/main.py --server.address=0.0.0.0 --server.port=8501
+   ```
+3. Desconéctate igual que antes (`Ctrl + b`, luego `d`).
+
+### Comandos útiles de tmux
+
+- Listar sesiones activas:
+  ```bash
+  tmux ls
+  ```
+
+- Volver a una sesión:
+  ```bash
+  tmux attach -t nombre_sesion
+  ```
+
+- Cerrar una sesión definitivamente (dentro de tmux):
+  ```bash
+  exit
+  ```
+
 
 ## Configuración de Puertos
 
@@ -119,4 +169,5 @@ Repetir para cada worker.
 
 - El frontend Streamlit se comunica internamente con el backend FastAPI usando `http://localhost:5454`.
 - El Frontend depende de los nombres de las variables en la base de datos. Si se modifican estos nombres, los cambios no se actualizan automáticamente en el Frontend, lo que puede provocar fallos.
-  
+
+
