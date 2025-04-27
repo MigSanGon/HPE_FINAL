@@ -5,7 +5,7 @@ import requests
 st.title("Visualización de centros sanitarios")
 
 # Llamada a la API
-url_H = "http://localhost:8080/api/med"
+url_H = "http://localhost:8080/api/hospital"
 response = requests.get(url_H)
 
 if response.status_code == 200:
@@ -15,7 +15,7 @@ if response.status_code == 200:
 else:
     st.error("No se pudieron cargar los datos de la API.")
 
-url_HC = "http://localhost:8080/api/clin"
+url_HC = "http://localhost:8080/api/healthcare_clinic"
 response = requests.get(url_HC)
 
 if response.status_code == 200:
@@ -25,7 +25,7 @@ if response.status_code == 200:
 else:
     st.error("No se pudieron cargar los datos de la API.")
 
-url_Ph = "http://localhost:8080/api/phar"
+url_Ph = "http://localhost:8080/api/pharmacy"
 response = requests.get(url_Ph)
 
 if response.status_code == 200:

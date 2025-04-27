@@ -15,9 +15,9 @@ def cargar_datos(url):
         return pd.DataFrame()
 
 # --- Cargar datos desde la API ---
-url_pet = "http://localhost:8080/api/pet"
-url_dayc = "http://localhost:8080/api/dayc"
-url_seni = "http://localhost:8080/api/seni"
+url_pet = "http://localhost:8080/api/pet_services"
+url_dayc = "http://localhost:8080/api/daycare"
+url_seni = "http://localhost:8080/api/senior_living"
 url_event_c = "http://localhost:8080/api/event_c"
 url_event_s = "http://localhost:8080/api/event_s"
 url_cities = "http://localhost:8080/api/cities"

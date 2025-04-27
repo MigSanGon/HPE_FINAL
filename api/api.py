@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from common.data_layer_med import cargar_med,cargar_clin,cargar_phar,cargar_cities1
 from common.data_layer_asist import cargar_dayc,cargar_pet,cargar_seni,cargar_event_c,cargar_event_s
 from common.data_layer_supply import cargar_gas,cargar_shop,cargar_super,cargar_auto
-from common.data_layer_descan import cargar_gym,cargar_venue,cargar_restaurant,cargar_park,cargar_hotel,cargar_religious_building
+from common.data_layer_descan import cargar_gym,cargar_venue,cargar_restaurant,cargar_park,cargar_hotel,cargar_religious_building,cargar_school,cargar_bank,cargar_laundromat,cargar_salon,cargar_transportation_hub,cargar_office_building,cargar_government_building,cargar_office_building
 from common.data_layer_test import test_hospital
 app = FastAPI()
 
@@ -11,33 +11,33 @@ def obtener_cities1():
     df = cargar_cities1()
     return df.to_dict(orient="records")
 
-@app.get("/api/med")
+@app.get("/api/hospital")
 def obtener_med():
     df = cargar_med()
     return df.to_dict(orient="records")
 
-@app.get("/api/clin")
+@app.get("/api/healthcare_clinic")
 def obtener_clin():
     df = cargar_clin()
     return df.to_dict(orient="records")
 
-@app.get("/api/phar")
+@app.get("/api/pharmacy")
 def obtener_phar():
     df = cargar_phar()
     return df.to_dict(orient="records")
 
 
-@app.get("/api/dayc")
+@app.get("/api/daycare")
 def obtener_dayc():
     df = cargar_dayc()
     return df.to_dict(orient="records")
 
-@app.get("/api/pet")
+@app.get("/api/pet_services")
 def obtener_pet():
     df = cargar_pet()
     return df.to_dict(orient="records")
 
-@app.get("/api/seni")
+@app.get("/api/senior_living")
 def obtener_seni():
     df = cargar_seni()
     return df.to_dict(orient="records")
@@ -57,17 +57,17 @@ def obtener_shop():
     df = cargar_shop()
     return df.to_dict(orient="records")
 
-@app.get("/api/super")
+@app.get("/api/supermarket")
 def obtener_super():
     df = cargar_super()
     return df.to_dict(orient="records")
 
-@app.get("/api/auto")
+@app.get("/api/auto_service")
 def obtener_auto():
     df = cargar_auto()
     return df.to_dict(orient="records")
 
-@app.get("/api/gas")
+@app.get("/api/gas_station")
 def obtener_gas():
     df = cargar_gas()
     return df.to_dict(orient="records")
@@ -100,6 +100,54 @@ def obtener_religious_building():
 @app.get("/api/park")
 def obtener_park():
     df = cargar_park()
+    return df.to_dict(orient="records")
+
+# --- School ---
+@app.get("/api/school")
+def obtener_school():
+    df = cargar_school()
+    return df.to_dict(orient="records")
+
+# --- Office Building ---
+@app.get("/api/office_building")
+def obtener_office_building():
+    df = cargar_office_building()
+    return df.to_dict(orient="records")
+
+# --- Bank ---
+@app.get("/api/bank")
+def obtener_bank():
+    df = cargar_bank()
+    return df.to_dict(orient="records")
+
+# --- Transportation Hub ---
+@app.get("/api/transportation_hub")
+def obtener_transportation_hub():
+    df = cargar_transportation_hub()
+    return df.to_dict(orient="records")
+
+# --- Laundromat ---
+@app.get("/api/laundromat")
+def obtener_laundromat():
+    df = cargar_laundromat()
+    return df.to_dict(orient="records")
+
+# --- Salon ---
+@app.get("/api/salon")
+def obtener_salon():
+    df = cargar_salon()
+    return df.to_dict(orient="records")
+
+# --- Government Building ---
+@app.get("/api/government_building")
+def obtener_government_building():
+    df = cargar_government_building()
+    return df.to_dict(orient="records")
+
+# --- Fabric ---
+@app.get("/api/fabric")
+def obtener_fabric():
+    df = cargar_fabric()
     return df.to_dict(orient="records")
 
 

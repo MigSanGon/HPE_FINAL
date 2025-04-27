@@ -16,9 +16,9 @@ def cargar_datos(url):
 
 # --- Cargar datos desde la API ---
 url_shop = "http://localhost:8080/api/shop"
-url_gas = "http://localhost:8080/api/gas"
-url_super = "http://localhost:8080/api/super"
-url_auto = "http://localhost:8080/api/auto"
+url_gas = "http://localhost:8080/api/gas_station"
+url_super = "http://localhost:8080/api/supermarket"
+url_auto = "http://localhost:8080/api/auto_service"
 url_cities = "http://localhost:8080/api/cities"
 
 
