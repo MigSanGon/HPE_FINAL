@@ -1,10 +1,77 @@
 from fastapi import FastAPI
+from typing import Optional
+from common.data_layer import cargar_people_enriquecido, obtener_hospitales_cercanos
+from fastapi import Query
+from datetime import datetime
+import common.data_layer_c as data_layer_c
 from common.data_layer_med import cargar_med,cargar_clin,cargar_phar,cargar_cities1
 from common.data_layer_asist import cargar_dayc,cargar_pet,cargar_seni,cargar_event_c,cargar_event_s
 from common.data_layer_supply import cargar_gas,cargar_shop,cargar_super,cargar_auto
-from common.data_layer_descan import cargar_gym,cargar_venue,cargar_restaurant,cargar_park,cargar_hotel,cargar_religious_building,cargar_school,cargar_bank,cargar_laundromat,cargar_salon,cargar_transportation_hub,cargar_office_building,cargar_government_building,cargar_office_building
-from common.data_layer_test import test_hospital
+from common.data_layer_descan import cargar_fabric,cargar_gym,cargar_venue,cargar_restaurant,cargar_park,cargar_hotel,cargar_religious_building,cargar_school,cargar_bank,cargar_laundromat,cargar_salon,cargar_transportation_hub,cargar_office_building,cargar_government_building,cargar_office_building
+
 app = FastAPI()
+
+
+@app.get("/api/greenlake-eval/people")
+def obtener_people(skip: int = 0, limit: int = 100):
+    df = cargar_people_enriquecido(skip=skip, limit=limit)
+    return df.to_dict(orient="records")
+
+@app.get("/api/state_borders")
+def obtener_estado_fronteras():
+    df = data_layer_c.estado_fronteras()
+    return df.to_dict(orient="records")
+
+@app.get("/api/city_borders")
+def obtener_ciudad_fronteras():
+    df = data_layer_c.ciudad_fronteras()
+    return df.to_dict(orient="records")
+
+@app.get("/api/parcels")
+def obtener_parcelas():
+    df = data_layer_c.parcels()
+    return df.to_dict(orient="records")
+
+@app.get("/api/roads")
+def obtener_carreteras():
+    df = data_layer_c.roads()
+    return df.to_dict(orient="records")
+
+@app.get("/api/rental_vehicles")
+def obtener_vehiculos_de_alquiler():
+    df = data_layer_c.rental_vehicles()
+    return df.to_dict(orient="records")
+
+@app.get("/api/greenlake-eval/test")
+def ping():
+    return {
+        "metadata": {
+            "status": "success",
+            "timestamp": datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ")
+        },
+        "results": {
+            "status": "active"
+        }
+    }
+     
+
+@app.get("/api/greenlake-eval/hospitals/nearby")
+def hospitales_cercanos(
+    lat: float = Query(..., description="Latitud del punto central"),
+    lon: float = Query(..., description="Longitud del punto central"),
+    radius: int = Query(1000, description="Radio en metros (opcional, por defecto 1000)")
+):
+    df = obtener_hospitales_cercanos(lat, lon, radius)
+
+    resultados = df.to_dict(orient="records")
+
+    return {
+        "metadata": {
+            "status": "success",
+            "timestamp": datetime.utcnow().isoformat() + "Z"
+        },
+        "results": resultados
+    }
 
 @app.get("/api/cities")
 def obtener_cities1():
@@ -151,51 +218,3 @@ def obtener_fabric():
     return df.to_dict(orient="records")
 
 
-#TESTS
-from pydantic import BaseModel
-from typing import List
-from datetime import datetime
-
-
-class Metadata(BaseModel):
-    status: str
-    timestamp: str
-
-class ApiResponse(BaseModel):
-    metadata: Metadata
-    results: List[dict]
-
-@app.get("/api/hospitals/nearby")
-def obtener_hospital(lat:float, lon:float,radius:int):
-    df = test_hospital(lon,lat,radius)
-    # Si no hay resultados, retornamos una respuesta vacía
-    if df is None or df.empty:
-        return ApiResponse(
-            metadata=Metadata(
-                status="success",
-                timestamp=datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ")
-            ),
-            results=[]
-        )
-    
-    # Convertir los resultados del DataFrame en un formato de lista de diccionarios
-    results = df.to_dict(orient="records")
-
-    # Generar la metadata con el timestamp
-    metadata = Metadata(
-        status="success",
-        timestamp=datetime.utcnow().strftime(r"%Y-%m-%dT%H:%M:%SZ")
-    )
-
-    # Generar la respuesta final
-    response = ApiResponse(
-        metadata=metadata,
-        results=results
-    )
-
-    return response
-
-# @app.get("/api/sensors/<operation>")
-# def obtener_sensores(operation:str, city_id:str,sensor_type:str,date:str):
-#     df = test_sensor(operation:str, city_id:str,sensor_type:str,date:str)
-#     return df.to_dict(orient="results")
