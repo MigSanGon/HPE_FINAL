@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 from fastapi import Query
+from datetime import datetime
 from common.data_layer import cargar_cities
 import common.data_layer_c as data_layer_c
 
@@ -34,3 +35,16 @@ def obtener_carreteras():
 def obtener_vehiculos_de_alquiler():
     df = data_layer_c.rental_vehicles()
     return df.to_dict(orient="records")
+
+@app.get("/api/greenlake-eval/test")
+def ping():
+    return {
+        "metadata": {
+            "status": "success",
+            "timestamp": datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ")
+        },
+        "results": {
+            "status": "active"
+        }
+    }
+     
