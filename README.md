@@ -112,7 +112,7 @@ Repetir para cada worker.
 - **Frontend (Streamlit)**:  
   `http://IP_DE_TU_VM:8501`
 
-- **Backend API REST (FastAPI)** (documentación Swagger):  
+- **Backend API REST documentación**: 
   `http://IP_DE_TU_VM:5454/docs`
 
 ## Notas Adicionales
